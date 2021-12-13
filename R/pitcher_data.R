@@ -19,14 +19,5 @@
 #'
 #' @source Duke Baseball coaching staff
 #'
+"pitcher_data"
 
-library(magrittr)
-library(dplyr)
-
-pitcher_data <- as_tibble(data) %>%
-  filter(AutoPitchType %in% setdiff(AutoPitchType,
-                                    c("Undefined","Other")), HitType != "Bunt",
-         PitchCall != "BallIntentional", !is.na(SpinRate)) %>%
-  select(AutoPitchType, PitchCall, RelSpeed, SpinRate, Tilt,
-         InducedVertBreak, HorzBreak, PlateLocHeight,
-         PlateLocSide, ExitSpeed)

@@ -1,5 +1,5 @@
 #' @title hitter_data
-#'
+#' @docType data
 #' @description TrackMan metrics corresponding to the balls put into play for which an exit velocity was recorded for 60 games during the 2018 college baseball season.
 #'
 #' @format A data frame consisting of 2355 observations with 5 variables.
@@ -14,18 +14,9 @@
 #'
 #' @source Duke Baseball coaching staff
 #'
+#'@examples
+#'summary(hitter_data)
+ "hitter_data"
 
-library(magrittr)
-library(dplyr)
-hitter_data <- as_tibble(data) %>%
-  filter(PitchCall == "InPlay",HitType !=
-           "Bunt",!is.na(ExitSpeed),HitType != "Undefined",
-         AutoPitchType != "Other") %>%
-  select("AutoPitchType", "HitType" ,"PlayResult", "ExitSpeed",
-         "ExitAngle") %>%
-  mutate(Result = ifelse(
-    PlayResult %in% c("Single","Double","Triple","HomeRun"),
-    PlayResult, "Out")) %>%
-  select(-PlayResult)
 
 
