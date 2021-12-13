@@ -1,0 +1,10 @@
+Package: TrackMan
+Title: Predicting and visualizing play results from TrackMan metrics 
+Version: 0.1.0
+Authors@R: 
+    person("Matt", "Dockman", , "matthew.dockman@duke.edu", role = c("aut", "cre"))
+Description: TrackMan uses 60 college baseball games from the 2018 season as a training set to predict swing and miss from 4 key pitch design metrics 
+License: MIT + file LICENSE
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.1.2
