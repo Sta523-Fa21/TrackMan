@@ -11,7 +11,8 @@ RoxygenNote: 7.1.2
 URL: https://github.com/Sta523-Fa21/TrackMan
 BugReports: https://github.com/Sta523-Fa21/TrackMan/issues
 Depends: 
-    R (>= 2.10)
+    R (>= 2.10),
+    tidymodels
 LazyData: true
 Imports: 
     ggplot2,

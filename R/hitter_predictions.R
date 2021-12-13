@@ -1,25 +1,33 @@
-#'@title hitter_predictions
+#' @name hitter_predictions
+#'
+#' @title hitter_predictions
+#'
+#' @description Predicts the result of a ball in play based on the exit velocity, launch angle, hit type, and pitch type.
+#'
+#' @param PitchType Type of pitch thrown (fastball, slider, etc.)
+#' @param HitType Description of ball in play (groundball, line drive, flyball, popup)
+#' @param ExitSpeed The exit velocity in mph
+#' @param ExitAngle How steeply up or down the ball leaves the bat in degrees
+#' @param data A data frame corresponding to the training set
 #'
 #'
 #'
 #'
 #'
+#' @return Returns a tibble with the predicted probability for the result being a single, double, triple, home run, or out
 #'
 #'
-#'
-#'
-#'
-#'
-#'
-#'
+#' @export
 #'
 
+library(tidymodels)
+library(magrittr)
 hitter_predictions = function(PitchType, HitType, ExitSpeed, ExitAngle, data){
 
 set.seed(17)
-hitter_folds = vfold_cv(data, v=10)
+hitter_folds = vfold_cv(data, v=5)
 
-hitter_rf_model = rand_forest(mtry = tune(), min_n = tune(), trees = 500) %>%
+hitter_rf_model = rand_forest(mtry = tune(), min_n = tune(), trees = 250) %>%
   set_engine("ranger", num.threads = 4) %>%
   set_mode("classification")
 
@@ -49,19 +57,5 @@ hitter_rf_model_final <-
                    "Triple"))
     }
 
-#'@title pitcher_swing_predictions
-#'
-#'
-#'
-#'
-#'
-#'
-#'
-#'
-#'
-#'
-#'
-#'
-#'
-#'
+
 
