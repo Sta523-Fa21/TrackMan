@@ -1,2 +1,2 @@
 # TrackMan
-rr
+Initially created a golf tracking technology, the TrackMan system has become ubiquitous across the highest levels of baseball. Major League Baseball has implemented TrackMan as part of its Statcast package and the metrics it provides have increasingly become a significant talking point in its TV broadcasts. With respect to college baseball, the vast majority of Power 5 schools have invested in the technology, using it 
