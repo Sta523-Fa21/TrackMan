@@ -10,7 +10,7 @@
 #'@param spinrate The rate at which the ball is spinning in rpm
 #'@param tilt The axis on which the ball spins, measured like hours and minutes on a clock, rounded to the nearest 15 minutes
 #'@param inducedvertbreak The vertical difference in inches between where the ball is at home plate compared to where it would have been had it been affected by gravity alone
-#'@param data A data frame corresponding to the data set
+#'@param data A data frame corresponding to the training set
 #'
 #'
 #'@return Returns a plot with pitches in the given training set that are within one standard deviation for each of the metrics listed, colored by the corresponding exit velocity
@@ -23,7 +23,7 @@ library(magrittr)
 pitcher_exitvelo_plot = function(pitchtype, relspeed, spinrate, tilt, inducedvertbreak, data){
 
   filter_pitcher =  data %>%
-   filter(!is.na(ExitSpeed), PitchCall == "InPlay", AutoPitchType = pitchtype)
+   filter(!is.na(ExitSpeed), PitchCall == "InPlay", AutoPitchType == pitchtype)
 
   filter_pitcher = filter_pitcher %>%
   filter(RelSpeed > relspeed - 0.5*sd(filter_pitcher$RelSpeed) & RelSpeed < relspeed + 0.5*sd(filter_pitcher$RelSpeed), SpinRate > spinrate - 0.5*sd(filter_pitcher$SpinRate) & SpinRate < spinrate + 0.5*sd(filter_pitcher$SpinRate), InducedVertBreak >  inducedvertbreak - 0.5*sd(filter_pitcher$InducedVertBreak) & InducedVertBreak <  inducedvertbreak + 0.5*sd(filter_pitcher$InducedVertBreak), Tilt %in% tilt_function(tilt))
