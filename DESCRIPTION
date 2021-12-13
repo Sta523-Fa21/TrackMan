@@ -16,7 +16,8 @@ LazyData: true
 Imports: 
     ggplot2,
     dplyr,
-    magrittr
+    magrittr,
+    stringr
 Suggests: 
     rmarkdown,
     knitr
