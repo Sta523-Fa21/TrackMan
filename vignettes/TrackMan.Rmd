@@ -17,3 +17,134 @@ knitr::opts_chunk$set(
 ```{r setup}
 library(TrackMan)
 ```
+
+Baseball has always been rooted in numbers and probabilities, but in recent years, the game has become increasingly dependent upon analytics. With the rise of TrackMan and its addition to Major League Baseball’s Statcast platform
+as well as the impact of Moneyball, college baseball and major league teams have responded by creating analytics departments and building statistical models to better their team through the draft and free agency. Presently, many
+teams will not draft position players with a max exit velocity below a certain threshold. As another example, the Dodgers have admitted that they will only sign players with an average fastball spin rate above a certain threshold. TrackMan provides a wealth of in-game metrics pertaining to performance. For
+pitchers, the system gives release velocity, spin rate, tilt (the axis on which the ball spins, measured like hours and minutes on a clock, rounded to the nearest 15 minutes), induced vertical break (the vertical difference in
+inches between where the ball is at home plate compared to where it would have been had it been affected by gravity alone), horizontal break, and location when the pitch crosses home plate. For hitters, the system yields the exit velocity of the ball as it initially leaves the bat and launch angle (how
+steeply up or down the ball leaves the bat). With the wide swath of data that TrackMan has yielded, it has become clear in baseball circles that the first four pitcher metrics and the two hitter metrics described above serve as the greatest predictors of a player’s success. Given that these are the greatest predictors of a player’s performance results, we would like to use these predictors to build a model to accurately predict a player’s performance from
+these metrics alone. As our proxy for hitter success, we use the result of the at-bat, constrained to either out, single, double, triple, or home run. Bunts were eliminated because they do not represent true swings while errors and sacrifice flies were lumped together with outs because these at-bats either did result in outs or should have resulted in outs. We chose to not merge the
+at-bats that resulted in hits into one category because an extra-base hit produces more expected runs and wins than does a single, so a home run or
+double indicates a better outcome than a single. As our proxy for pitcher success, we used both swing and miss rate and exit velocity against. We made the decision to use both measures because each on its own can provide a biased
+assessment of performance. A pitcher’s slider may have an average exit
+velocity against of 105mph, but that average could have been generated from
+one bad pitch out of ten where the other nine resulted in swings and misses.
+Similarly, a pitcher’s changeup may have a swing and miss rate of only 15-20%, but it generates soft contact and results in low exit velocity outcomes. To fit the models, we made the modeling decision to use a random forest model. Due to the randomness of baseball and the weird outcomes that sometimes occur,
+it is clear that the decision boundary is not going to be very clear. As a result, a model such as logistic regression or QDA that makes strong distributional assumptions regarding the generation of data will not perform well in this context. Running these models on the data confirm as much. A
+“model-free” approach is required here which led us to consider k-nearest neighbors, random forest, and gradient-boosted trees. Due to the computational challenges posed by k-nearest neighbors with a training set of this size combined with the fact that we would have to choose k via cross-validation, this model was not selected. Similarly, gradient-boosted trees also provided
+too great of a computational burden. Balancing model assumptions with computational complexity led us to select the random forest as our model of choice. To lower the computational burden, we used 5-fold cross-validation and
+introduced regularization by using only 250 trees when normally we would have used at least 500 or 1000. To fit the model for each of our performance metrics, we used the tidymodels package in the R ecosystem. We will do a walkthrough of this process for the swing and miss rate, but it is very easy to generalize the process. 
+
+To fit our model, we first had to manipulate our raw data. The raw data is roughly 30 Excel spreadsheets stored inside a zip file. We brought this data in using the read.table function along with the unzip functionality. However, this stored every one of our 77 columns in only one column separated by commas. To fix this issue, we used the splitstackshape package to split this column into our 77 columns. We finished manipulating the raw data by the manually setting the column names to be the names found in TrackMan and selected the necessary columns while filtering out the unwanted rows to give our final hitter_data and pitcher_data data frames. With these data frames, we were able to conduct our predictive modeling exercise. For the swing and miss rate, we chose our four key metrics as well as pitch type and pitch call, and defined Result to indicate whether the pitch resulted in a swing and miss. 
+
+
+```{r}
+hitter_data <- hitter_data
+pitcher_data <- pitcher_data
+pitcher_data_model <- pitcher_data %>%
+                select(1:6) %>%
+    mutate(Result = ifelse(PitchCall == "StrikeSwinging", "Swing and Miss", "No Swing and Miss")) %>%
+    select(-PitchCall)
+```
+
+
+We began by defining our folds for cross validation using the vfold_cv function. 
+
+```{r}
+pitcher_folds = vfold_cv(pitcher_data_model, v=5)
+```
+
+
+We then defined our random forest model with 250 trees using the ranger engine and the mode set to classification to predict either swing and miss or no swing and miss. We used the tune() function for mtry, the number of predictors
+that we randomly select at each node to determine our splits and min_n, the minimum number of data points that are required at each node in order for the
+node to be split further; this will allow us to choose these hyperparameters via cross-validation. 
+
+```{r}
+pitcher_swing_rf_model = rand_forest(mtry = tune(), min_n = tune(), trees = 250) %>%
+    set_engine("ranger", num.threads = 4) %>%
+    set_mode("classification")
+```
+
+
+We continued by specifying our recipe and workflow. In this case, since we want to predict swing and miss from all other variables in our data frame, we specify Result ~ . in order to indicate this. Moreover, we specify our workflow by adding our model and recipe specifications. 
+
+```{r}
+ pitcher_rf_recipe = recipe(Result ~ ., data = pitcher_data_model)
+
+  pitcher_rf_workflow = workflow() %>%
+    add_model(pitcher_swing_rf_model) %>%
+    add_recipe(pitcher_rf_recipe)
+```
+
+
+To tune the model, we create a grid for possible hyperparameter value pairs and input this grid into the tune_grid() function in tidymodels, specifying
+our resamples to be the folds defined earlier. For each case, we specified
+mtry to be one of 1, 2, or 3 and min_n to be one of 5, 10, 15, or 20. Given that the number of predictors for this model is only 5, these values for mtry
+offer a good-trade between decorrelating the trees to provide greater overall variance reduction and limiting the bias in each individual tree in our random forest. The same can be said of the values chosen for min_n. 
+
+```{r}
+pitcher_rf_res = pitcher_rf_workflow %>%
+    tune_grid(
+      pitcher_folds,
+      grid = expand.grid( mtry = c(1,2,3), min_n = c(5,10,15,20)),
+      control = control_grid(save_pred = TRUE),
+      metrics = metric_set(accuracy)
+    )
+```
+
+
+
+Running the tuning step takes a few minutes, but once this is complete, we can use the select_best() function to select the best model based on accuracy. To
+predict hitter play result, we also used accuracy to select the best model whereas to predict exit velocity, we used root mean square error because that
+is a task in regression. With the best model we can finalize our workflow and fit the training data.
+
+```{r}
+ pitcher_swing_rf_model_final <-
+    finalize_workflow(pitcher_rf_workflow, select_best(pitcher_rf_res)) %>%
+    fit(pitcher_data_model)
+```
+
+It should be noted that though we used the training data provided in the package to fit our model, the function form of the model that is available to the user allows the user to optionally specify his/her own training set as an
+argument in the function. With this training set, the steps above carry through the exact same. The fact that the user has this feature available to him/her explains why we must perform cross-validation inside the function. Though it would be easy to perform cross-validation on our own training data
+and choose these hyperparameters to fit the model (it would surely save the user waiting time), we have no reason to suppose that the optimal hyperparameters are the same across all training sets. In an attempt to be as
+general and accurate as possible, we will sacrifice some computation time.
+
+With our model finalized, we can now predict any new given data by placing it into a data frame, making sure that the column names are the same as the ones specified in the training data, and using the predict function. For this example, we will use an average fastball and slider from myself. We can see that an 88 mph fastball from the left side with an 11:15 tilt, 1950 spin rate, and induced vertical break of 17 is predicted to have a swing and miss probability of 0.024, which is close to the true mark of around 5%.
+
+```{r}
+test = data.frame(AutoPitchType = "Fastball" , RelSpeed = 88, SpinRate = 1950, Tilt= "11:15", InducedVertBreak= 17)
+
+  pitcher_swing_rf_model_final %>%
+    predict(test, type = "prob") %>%
+    `colnames<-`(c("Not a Swing and Miss", "Swing and Miss")) 
+```
+We will also use my average slider and changeup just to see some offspeed.
+
+```{r}
+test = data.frame(AutoPitchType = "Slider" , RelSpeed = 76, SpinRate = 2450, Tilt= "3:00", InducedVertBreak= 0)
+
+  pitcher_swing_rf_model_final %>%
+    predict(test, type = "prob") %>%
+    `colnames<-`(c("Not a Swing and Miss", "Swing and Miss"))
+```
+```{r}
+test = data.frame(AutoPitchType = "ChangeUp" , RelSpeed = 77, SpinRate = 1600, Tilt= "10:45", InducedVertBreak= 8)
+
+  pitcher_swing_rf_model_final %>%
+    predict(test, type = "prob") %>%
+    `colnames<-`(c("Not a Swing and Miss", "Swing and Miss"))
+```
+The predicted swing and miss on the slider and changeup, respectively, are 11%
+and 17%, which are on the low side. The user should be aware that this sample size is small relative to the number of pitches and games across a college
+baseball season, let alone an MLB season that is 2.5 times as long. As a result, he/she should be careful when examining pitches that occur with less
+frequency. For example, in this training set, we have an even smaller sample size of left-handed pitching, which makes it tougher to predict left-handed
+data, including my own data. In the aggregate though, the model was found upon cross-validation to produce a CV error of 92%, so overall, performance is good, and we can feel comfortable using this model to make predictions. In
+addition, for classification, we have chosen to predict class probabilities rather than outright class predictions because we ultimately want to predic
+t swing and miss rate in this scenario. For the hitter play result model, we
+made the same decision because we felt it was informative to the user since it allows for easier comparison across different inputted values. Conversely, for
+the exit velocity against model, we opted for a single predicted value because providing a range may have led to incorrect probabilistic conclusions from non-statistical users. 
+To convert the model into a function, we simply assume that the data provided is of the same form in terms of format as our training data and use dplyr from there to get the data frame into the final form. Since we do not assume any prior statistical knowledge from our user, we will not allow them to specify a model. Instead, we will just allow him/her to input metrics to obtain predictions because that is ultimately the goal of this package. From here, natural extensions of this exercise would be to use plots to see the effect of location. 
+
+
+
