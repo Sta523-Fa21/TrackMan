@@ -3,7 +3,7 @@ Title: Predicting and visualizing play results from TrackMan metrics
 Version: 0.1.0
 Authors@R: 
     person("Matt", "Dockman", , "matthew.dockman@duke.edu", role = c("aut", "cre"))
-Description: TrackMan uses 60 college baseball games from the 2018 season as a training set to predict swing and miss from 4 key pitch design metrics 
+Description: TrackMan predicts swing and miss and exit velocity from 4 key pitch design metrics and play result (type of hit or out) from initial swing data using an optimally tuned random forest model. A training set of 60 college baseball games from the 2018 season whose average metrics are roughly in line with those seen across college baseball is used, but should the user feel that these games are not broadly representative, he/she has the ability to provide his/her own data set. In particular, TrackMan provides five functions as part of its analysis and visualization approach. Three of the functions provide the predicted class probabilities or values for the situations described previously while the other two create visualizations of similar pitches/ results as the ones inputted by the user. In an attempt to be interactive, TrackMan lastly provides a user interface and server to output the results in a Shiny app. 
 License: MIT + file LICENSE
 Encoding: UTF-8 
 Roxygen: list(markdown = TRUE)
