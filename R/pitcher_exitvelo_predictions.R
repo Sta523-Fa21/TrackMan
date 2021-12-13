@@ -1,8 +1,8 @@
-#' @name pitcher_swing_predictions
+#' @name pitcher_exitvelo_predictions
 #'
-#' @title Pitcher Swing Predictions
+#' @title Pitcher Exit Velocity Predictions
 #'
-#' @description Predicts the probability of a pitch resulting in a swing and miss based on four key pitch design metrics.
+#' @description Predicts the exit velocity of a ball in play off of a pitch based on four key pitch design metrics.
 #'
 #' @param PitchType The type of pitch thrown (fastball, slider, etc.)
 #' @param RelSpeed The velocity of the pitch when it leaves the pitcher's hand in mph
@@ -11,7 +11,7 @@
 #' @param InducedVertBreak The vertical difference in inches between where the ball is at home plate compared to where it would have been had it been affected by gravity alone
 #' @param data A data frame corresponding to the data set
 #'
-#' @return Returns a tibble with the predicted probability for a swing and miss
+#' @return Returns a tibble with the predicted exited velocity
 #'
 #'
 #' @export
@@ -19,22 +19,21 @@
 library(tidymodels)
 library(magrittr)
 
-pitcher_swing_predictions = function(pitchtype, relspeed, spinrate, tilt, inducedvertbreak, data){
+pitcher_exitvelo_predictions = function(pitchtype, relspeed, spinrate, tilt, inducedvertbreak, data){
 
-  set.seed(90)
+  set.seed(57)
 
   pitcher_data_model = data %>%
-    select(1:6) %>%
-    mutate(Result = ifelse(PitchCall == "StrikeSwinging", "Swing and Miss", "No Swing and Miss")) %>%
-    select(-PitchCall)
+    filter(!is.na(ExitSpeed), PitchCall == "InPlay") %>%
+    select(1,3:6,10)
 
   pitcher_folds = vfold_cv(pitcher_data_model, v=5)
 
   pitcher_swing_rf_model = rand_forest(mtry = tune(), min_n = tune(), trees = 250) %>%
     set_engine("ranger", num.threads = 4) %>%
-    set_mode("classification")
+    set_mode("regression")
 
-  pitcher_rf_recipe = recipe(Result ~ ., data = pitcher_data_model)
+  pitcher_rf_recipe = recipe(ExitSpeed ~ ., data = pitcher_data_model)
 
   pitcher_rf_workflow = workflow() %>%
     add_model(pitcher_swing_rf_model) %>%
@@ -45,7 +44,7 @@ pitcher_swing_predictions = function(pitchtype, relspeed, spinrate, tilt, induce
       pitcher_folds,
       grid = expand.grid( mtry = c(1,2,3), min_n = c(5,10,15,20)),
       control = control_grid(save_pred = TRUE),
-      metrics = metric_set(accuracy)
+      metrics = metric_set(rmse)
     )
 
   pitcher_swing_rf_model_final <-
@@ -55,5 +54,11 @@ pitcher_swing_predictions = function(pitchtype, relspeed, spinrate, tilt, induce
   test = data.frame(AutoPitchType = pitchtype , RelSpeed = relspeed, SpinRate = spinrate, Tilt= tilt, InducedVertBreak= inducedvertbreak)
 
   pitcher_swing_rf_model_final %>%
-    predict(test, type = "prob") %>%
-    `colnames<-`(c("Not a Swing and Miss", "Swing and Miss")) }
+    predict(test) %>%
+    `colnames<-`(c("Predicted Exit Velocity"))
+
+
+  }
+
+
+

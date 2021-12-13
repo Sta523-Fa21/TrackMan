@@ -1,6 +1,6 @@
 #' @name hitter_predictions
 #'
-#' @title hitter_predictions
+#' @title Hitter Predictions
 #'
 #' @description Predicts the result of a ball in play based on the exit velocity, launch angle, hit type, and pitch type.
 #'
@@ -22,7 +22,7 @@
 
 library(tidymodels)
 library(magrittr)
-hitter_predictions = function(PitchType, HitType, ExitSpeed, ExitAngle, data){
+hitter_predictions = function(pitchtype, hittype, exitspeed, exitangle, data){
 
 set.seed(17)
 hitter_folds = vfold_cv(data, v=5)
@@ -49,7 +49,7 @@ hitter_rf_model_final <-
   finalize_workflow(rf_workflow, select_best(hitter_rf_res)) %>%
   fit(data)
 
-  test = data.frame(PitchType, HitType, ExitSpeed, ExitAngle)
+  test = data.frame(AutoPitchType =pitchtype, HitType=hittype, ExitSpeed =exitspeed, ExitAngle=exitangle)
 
   hitter_rf_model_final %>%
     predict(test, type = "prob")%>%

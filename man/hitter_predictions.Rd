@@ -2,7 +2,7 @@
 % Please edit documentation in R/hitter_predictions.R
 \name{hitter_predictions}
 \alias{hitter_predictions}
-\title{hitter_predictions}
+\title{Hitter Predictions}
 \arguments{
 \item{PitchType}{Type of pitch thrown (fastball, slider, etc.)}
 
