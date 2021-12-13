@@ -4,15 +4,15 @@
 \alias{pitcher_swing_predictions}
 \title{Pitcher Swing Predictions}
 \arguments{
-\item{PitchType}{The type of pitch thrown (fastball, slider, etc.)}
+\item{pitchtype}{The type of pitch thrown (fastball, slider, etc.)}
 
-\item{RelSpeed}{The velocity of the pitch when it leaves the pitcher's hand in mph}
+\item{relspeed}{The velocity of the pitch when it leaves the pitcher's hand in mph}
 
-\item{SpinRate}{The rate at which the ball is spinning in rpm}
+\item{spinrate}{The rate at which the ball is spinning in rpm}
 
-\item{Tilt}{The axis on which the ball spins, measured like hours and minutes on a clock, rounded to the nearest 15 minutes}
+\item{tilt}{The axis on which the ball spins, measured like hours and minutes on a clock, rounded to the nearest 15 minutes}
 
-\item{InducedVertBreak}{The vertical difference in inches between where the ball is at home plate compared to where it would have been had it been affected by gravity alone}
+\item{inducedvertbreak}{The vertical difference in inches between where the ball is at home plate compared to where it would have been had it been affected by gravity alone}
 
 \item{data}{A data frame corresponding to the data set}
 }

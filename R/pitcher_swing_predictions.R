@@ -4,11 +4,11 @@
 #'
 #' @description Predicts the probability of a pitch resulting in a swing and miss based on four key pitch design metrics.
 #'
-#' @param PitchType The type of pitch thrown (fastball, slider, etc.)
-#' @param RelSpeed The velocity of the pitch when it leaves the pitcher's hand in mph
-#' @param SpinRate The rate at which the ball is spinning in rpm
-#' @param Tilt The axis on which the ball spins, measured like hours and minutes on a clock, rounded to the nearest 15 minutes
-#' @param InducedVertBreak The vertical difference in inches between where the ball is at home plate compared to where it would have been had it been affected by gravity alone
+#' @param pitchtype The type of pitch thrown (fastball, slider, etc.)
+#' @param relspeed The velocity of the pitch when it leaves the pitcher's hand in mph
+#' @param spinrate The rate at which the ball is spinning in rpm
+#' @param tilt The axis on which the ball spins, measured like hours and minutes on a clock, rounded to the nearest 15 minutes
+#' @param inducedvertbreak The vertical difference in inches between where the ball is at home plate compared to where it would have been had it been affected by gravity alone
 #' @param data A data frame corresponding to the data set
 #'
 #' @return Returns a tibble with the predicted probability for a swing and miss

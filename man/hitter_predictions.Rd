@@ -4,13 +4,13 @@
 \alias{hitter_predictions}
 \title{Hitter Predictions}
 \arguments{
-\item{PitchType}{Type of pitch thrown (fastball, slider, etc.)}
+\item{pitchtype}{Type of pitch thrown (fastball, slider, etc.)}
 
-\item{HitType}{Description of ball in play (groundball, line drive, flyball, popup)}
+\item{hittype}{Description of ball in play (groundball, line drive, flyball, popup)}
 
-\item{ExitSpeed}{The exit velocity in mph}
+\item{exitspeed}{The exit velocity in mph}
 
-\item{ExitAngle}{How steeply up or down the ball leaves the bat in degrees}
+\item{exitangle}{How steeply up or down the ball leaves the bat in degrees}
 
 \item{data}{A data frame corresponding to the training set}
 }

@@ -4,10 +4,10 @@
 #'
 #' @description Predicts the result of a ball in play based on the exit velocity, launch angle, hit type, and pitch type.
 #'
-#' @param PitchType Type of pitch thrown (fastball, slider, etc.)
-#' @param HitType Description of ball in play (groundball, line drive, flyball, popup)
-#' @param ExitSpeed The exit velocity in mph
-#' @param ExitAngle How steeply up or down the ball leaves the bat in degrees
+#' @param pitchtype Type of pitch thrown (fastball, slider, etc.)
+#' @param hittype Description of ball in play (groundball, line drive, flyball, popup)
+#' @param exitspeed The exit velocity in mph
+#' @param exitangle How steeply up or down the ball leaves the bat in degrees
 #' @param data A data frame corresponding to the training set
 #'
 #'
