@@ -13,3 +13,7 @@ BugReports: https://github.com/Sta523-Fa21/TrackMan/issues
 Depends: 
     R (>= 2.10)
 LazyData: true
+Imports: 
+    ggplot2,
+    dplyr,
+    magrittr
