@@ -116,7 +116,7 @@ test = data.frame(AutoPitchType = "Fastball" , RelSpeed = 88, SpinRate = 1950, T
     predict(test, type = "prob") %>%
     `colnames<-`(c("Not a Swing and Miss", "Swing and Miss")) 
 ```
-We will also use my average slider and changeup just to see some offspeed.
+We will also use my average slider and changeup just to see some offspeed. We should note also that the pitch types and hit types stored by TrackMan sometimes have awkward capital letters, so the user should consult the hitter or pitcher data set to confirm the way a pitch or hit should be spelled. Moreover, tilt is stored as a character, so when using the functions exported by TrackMan, tilt should be inputted as a character vector.
 
 ```{r}
 test = data.frame(AutoPitchType = "Slider" , RelSpeed = 76, SpinRate = 2450, Tilt= "3:00", InducedVertBreak= 0)
