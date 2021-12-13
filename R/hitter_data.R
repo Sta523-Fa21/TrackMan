@@ -15,5 +15,17 @@
 #' @source Duke Baseball coaching staff
 #'
 
+library(magrittr)
+library(dplyr)
+hitter_data <- as_tibble(data) %>%
+  filter(PitchCall == "InPlay",HitType !=
+           "Bunt",!is.na(ExitSpeed),HitType != "Undefined",
+         AutoPitchType != "Other") %>%
+  select("AutoPitchType", "HitType" ,"PlayResult", "ExitSpeed",
+         "ExitAngle") %>%
+  mutate(Result = ifelse(
+    PlayResult %in% c("Single","Double","Triple","HomeRun"),
+    PlayResult, "Out")) %>%
+  select(-PlayResult)
 
 

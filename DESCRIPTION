@@ -17,3 +17,7 @@ Imports:
     ggplot2,
     dplyr,
     magrittr
+Suggests: 
+    rmarkdown,
+    knitr
+VignetteBuilder: knitr
