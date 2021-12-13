@@ -18,7 +18,10 @@ Imports:
     ggplot2,
     dplyr,
     magrittr,
-    stringr
+    stringr,
+    parsnip,
+    yardstick,
+    tune
 Suggests: 
     rmarkdown,
     knitr

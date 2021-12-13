@@ -143,4 +143,10 @@ addition, for classification, we have chosen to predict class probabilities rath
 t swing and miss rate in this scenario. For the hitter play result model, we
 made the same decision because we felt it was informative to the user since it allows for easier comparison across different inputted values. Conversely, for
 the exit velocity against model, we opted for a single predicted value because providing a range may have led to incorrect probabilistic conclusions from non-statistical users. 
+
 To convert the model into a function, we simply assume that the data provided is of the same form in terms of format as our training data and use dplyr from there to get the data frame into the final form. Since we do not assume any prior statistical knowledge from our user, we will not allow them to specify a model. Instead, we will just allow him/her to input metrics to obtain predictions because that is ultimately the goal of this package. From here, natural extensions of this exercise would be to use plots to see the effect of location.
+
+To convert the model into a function, we simply assume that the data provided is of the same form in terms of format as our training data and use dplyr from there to get the data frame into the final form. Since we do not assume any prior statistical knowledge from our user, we will not allow them to specify a model. Instead, we will just allow him/her to input metrics to obtain predictions because that is ultimately the goal of this package. From here, natural extensions of this exercise would be to use plots to see the effect of location. 
+
+
+
